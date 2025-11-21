@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="200" viewBox="0 0 1600 200">
+  <rect width="1600" height="200" fill="#071226"/>
+  <g fill="#06324f" opacity="0.9">
+    <rect x="0" y="0" width="400" height="200"/>
+    <rect x="400" y="0" width="400" height="200"/>
+  </g>
+  <text x="40" y="120" fill="#0fb0ff" font-family="Segoe UI, Arial" font-size="36">Buses del Sistema — Fondo creativo</text>
+</svg>

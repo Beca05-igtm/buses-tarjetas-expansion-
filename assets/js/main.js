@@ -1,0 +1,1 @@
+// Este archivo contiene el código JavaScript para la funcionalidad del sitio, que puede incluir interactividad y manipulación del DOM.

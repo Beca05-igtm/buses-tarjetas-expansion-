@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buses del Sistema y Tarjetas de Expansión</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1>Buses del Sistema y Tarjetas de Expansión</h1>
+      <nav>
+        <a href="index.html">Introducción</a>
+        <a href="objetivo.html">Objetivo</a>
+        <a href="desarrollo.html">Desarrollo</a>
+        <a href="estudio.html">Estudio de Caso</a>
+        <a href="reflexiones.html">Reflexiones</a>
+        <a href="referencias.html">Referencias</a>
+      </nav>
+    </div>
+  </header>
+  
+
+  <main class="container">
+    <h2>Introducción</h2>
+    
+    <p>En la arquitectura de un computador moderno, los buses del sistema y las tarjetas de expansión son componentes fundamentales que muchas veces pasan desapercibidos, pero que determinan en gran medida el rendimiento, la escalabilidad y la compatibilidad de todo el sistema.</p>
+
+    <p>Los buses son las “autopistas” internas que permiten la comunicación entre el procesador, la memoria RAM, los dispositivos de almacenamiento y los periféricos. Las tarjetas de expansión (tarjetas gráficas, de sonido, de red, controladoras RAID, etc.) se conectan al sistema precisamente a través de estos buses y ranuras de expansión (PCIe, antiguamente PCI, AGP, etc.).</p>
+
+    <p>Entender estos elementos ayuda a optimizar aplicaciones, evitar cuellos de botella y escribir drivers más eficientes.</p>
+
+    <!-- TU DIAGRAMA EXACTO DE VON NEUMANN -->
+    <div class="von-neumann-img">
+      <img src="assets/images/Eckert-Mauchly_(von_Neumann)_architecture.svg.png" alt="Arquitectura de von Neumann">
+    </div>
+
+    <p class="lead-summary">
+      Resumen: La arquitectura de von Neumann separa unidad de procesamiento, memoria y dispositivos de E/S; los buses de datos, direcciones y control permiten la comunicación coordinada entre ellos. Entender este modelo facilita diagnosticar y optimizar cuellos de botella en sistemas reales.
+    </p>
+  </main>
+
+  <footer class="container">
+    <p class="site-summary">
+      Este sitio explica de forma práctica cómo los buses del sistema y las tarjetas de expansión influyen en el rendimiento y la compatibilidad del software profesional; contiene ejemplos, un estudio de caso detallado y referencias para ampliar el estudio.
+    </p>
+  </footer>
+
+</body>
+</html>

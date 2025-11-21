@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Desarrollo de Contenidos</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Desarrollo de Contenidos</h1>
+      <nav>
+        <a href="index.html">Introducción</a>
+        <a href="objetivo.html">Objetivo</a>
+        <a href="desarrollo.html">Desarrollo</a>
+        <a href="estudio.html">Estudio de Caso</a>
+      </nav>
+    </div>
+  </header>
+  
+
+  <main class="container">
+    <h2>3.1 Los buses del sistema</h2>
+    <p>Los buses son conjuntos de líneas eléctricas o lógicas que transportan información entre los distintos componentes del computador. Desde la perspectiva práctica para desarrollo y optimización, conviene entender:</p>
+
+    <h3>Tipos principales</h3>
+    <p>Se distinguen tres tipos funcionales que pueden implementarse sobre distintas topologías físicas:</p>
+
+    <table class="table">
+      <thead>
+        <tr><th>Tipo de Bus</th><th>Ancho típico actual</th><th>Función principal</th><th>Ejemplo práctico</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Bus de direcciones</td><td>64 bits</td><td>Indicar la ubicación de memoria o dispositivo</td><td>El CPU envía la dirección 0x7FFF para leer RAM</td></tr>
+        <tr><td>Bus de datos</td><td>64–512 bits</td><td>Transportar los datos reales</td><td>Transferencia de frames de video desde GPU</td></tr>
+        <tr><td>Bus de control</td><td>Variable</td><td>Señales de sincronización y control</td><td>Señal IRQ de una tarjeta de red</td></tr>
+      </tbody>
+    </table>
+
+    <h2>3.2 Tarjetas de expansión y ranuras</h2>
+    <p>Las tarjetas de expansión se conectan a la placa base mediante ranuras que implementan enlaces físicos con diferentes números de carriles (lanes) y topologías. El estándar dominante en sistemas actuales es PCI Express (PCIe), evolutivo en velocidad y número de lanes.</p>
+    <table class="table">
+      <thead>
+        <tr><th>Ranura/Tipo</th><th>Ancho de banda máx. (PCIe 5.0)</th><th>Uso típico</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>PCIe x16</td><td>~126 GB/s</td><td>Tarjetas gráficas modernas</td></tr>
+        <tr><td>PCIe x8</td><td>~63 GB/s</td><td>SSD NVMe, tarjetas de red 100 GbE</td></tr>
+        <tr><td>PCIe x4</td><td>~31 GB/s</td><td>SSD NVMe adicionales, tarjetas captura</td></tr>
+        <tr><td>PCIe x1</td><td>~8 GB/s</td><td>Tarjetas Wi‑Fi, sonido, USB adicionales</td></tr>
+      </tbody>
+    </table>
+
+    <h2>3.3 Impacto en el software aplicativo</h2>
+    <p>El conocimiento detallado de buses y ranuras es útil para desarrolladores que optimizan rendimiento o escriben software cercano al hardware (drivers, extensiones nativas, middleware). Puntos clave:</p>
+    <ul>
+      <li>Cuellos de banda: transferencias masivas (GPU↔DMA, streaming 4K/8K) requieren comprobar el ancho de banda efectivo del enlace.</li>
+      <li>Latencia y orden de llegada: aplicaciones en tiempo real deben considerar latencias de I/O y colas de DMA.</li>
+      <li>Compatibilidad de funciones avanzadas: Resizable BAR, SR-IOV o soporte de bifurcación de lanes pueden cambiar cómo se asignan recursos.</li>
+      <li>Design for scale: elegir plataformas con más lanes directos a CPU cuando se prevean múltiples dispositivos de alto rendimiento.</li>
+    </ul>
+
+    <figure>
+      <img src="assets/images/pcie-1024x768.jpg" alt="Diagrama placa base con ranuras" class="img-suggest small">
+      <figcaption>Diagrama: ejemplo de placa base con posiciones de ranuras PCIe, conexiones al chipset y rutas de memoria.</figcaption>
+    </figure>
+
+    <h3>Buenas prácticas para desarrolladores</h3>
+    <ol>
+      <li>Medir rendimiento en hardware real: usar herramientas como GPU-Z, lspci, iostat y profilers.</li>
+      <li>Preferir I/O directo (DMA) para cargas altas y evitar movimientos innecesarios por CPU.</li>
+      <li>Probar en plataformas con diferentes topologías (chipset limitado vs lanes directas a CPU).</li>
+      <li>Documentar requisitos mínimos de hardware en el software (cantidad de lanes, versión PCIe, soporte de características).</li>
+    </ol>
+  </main>
+  <footer class="container"><p class="footer-summary">Los desarrolladores deben entender la relación entre topología física y rendimiento efectivo: elegir plataforma y optimizaciones basadas en mediciones reales evita decisiones erróneas.</p></footer>
+</body>
+</html>

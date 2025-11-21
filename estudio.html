@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Estudio de Caso</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Estudio de Caso: Saturación del bus</h1>
+      <nav>
+        <a href="index.html">Introducción</a>
+        <a href="desarrollo.html">Desarrollo</a>
+        <a href="estudio.html">Estudio de Caso</a>
+        <a href="reflexiones.html">Reflexiones</a>
+      </nav>
+    </div>
+  </header>
+  
+
+  <main class="container">
+    <h2><em>El cuello de botella que mata el rendimiento en tiempo real</em></h2>
+
+    <h3><em>1. Caso propuesto por el docente</em></h3>
+    <p>Durante las pruebas de un sistema que procesa vídeo en tiempo real surge una lentitud totalmente inaceptable. El diagnóstico revela la causa: <em>saturación del bus de datos</em>. Varios dispositivos de expansión están utilizando el mismo canal y compiten por él. Como consecuencia, el vídeo se ralentiza, se pierden frames y aparece una latencia muy irregular, haciendo imposible mantener un flujo estable.</p>
+
+    <figure>
+      <img src="assets/images/buses-000.png" alt="Buses ilustración" class="img-suggest small">
+    </figure>
+
+    <hr>
+
+    <h3><em>2. Teoría: Cómo y por qué la saturación del bus destruye el rendimiento</em></h3>
+    <p>Un <em>bus de datos</em> es el “camino” físico por donde viajan las señales entre CPU, memoria, GPU, tarjetas de captura, discos NVMe y otros periféricos. En equipos modernos, ese camino suele ser <strong>PCI Express (PCIe)</strong>. Aunque es muy rápido, <strong>no es infinito</strong>: tiene un número limitado de carriles (lanes) y una capacidad máxima de transferencia.</p>
+
+    <figure>
+      <img src="assets/images/block CPU.jpg" alt="Bloque CPU" class="img-suggest small">
+    </figure>
+
+    <h4><em>¿Qué ocurre cuando varios dispositivos compiten por el mismo bus?</em></h4>
+    <ol>
+      <li><em>Recurso compartido → todos deben esperar turno.</em> El bus no puede atender simultáneamente a todos los dispositivos, así que entra en juego un mecanismo de arbitraje. Cada dispositivo recibe “su turno”, lo que reduce el rendimiento real.</li>
+      <li><em>Menor ancho de banda efectivo.</em> Aunque un enlace PCIe tenga cierto ancho de banda teórico, cuando varios dispositivos lo comparten, ese valor cae por la contención y el overhead.</li>
+      <li><em>Latencia impredecible (jitter).</em> En sistemas en tiempo real, cualquier retraso aleatorio provoca cortes, desincronización y pérdidas de datos. En vídeo significa <em>frames perdidos o reproducción entrecortada</em>.</li>
+      <li><em>Saturación del enlace CPU ↔ Chipset.</em> Muchos dispositivos conectados al chipset dependen de un solo enlace que suele ser PCIe x4 o x8. Si ese enlace se llena, todo lo conectado allí se ralentiza sin importar la potencia de CPU o GPU.</li>
+      <li><em>Limitación física de lanes.</em> Los procesadores sólo ofrecen cierta cantidad de PCIe lanes directas.</li>
+    </ol>
+
+    <h4><em>Ancho de banda real por generación PCIe (bidireccional)</em></h4>
+    <table class="table">
+      <thead>
+        <tr><th>Versión</th><th>x1</th><th>x4</th><th>x8</th><th>x16</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>PCIe 3.0</td><td>~0.985 GB/s</td><td>~3.94 GB/s</td><td>~7.88 GB/s</td><td>~15.75 GB/s</td></tr>
+        <tr><td>PCIe 4.0</td><td>~1.97 GB/s</td><td>~7.88 GB/s</td><td>~15.75 GB/s</td><td>~31.5 GB/s</td></tr>
+        <tr><td>PCIe 5.0</td><td>~3.94 GB/s</td><td>~15.75 GB/s</td><td>~31.5 GB/s</td><td>~63 GB/s</td></tr>
+        <tr><td>PCIe 6.0</td><td>~7.88 GB/s</td><td>~31.5 GB/s</td><td>~63 GB/s</td><td>~126 GB/s</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h3><em>3. Recomendaciones y decisiones de diseño para evitar cuellos de botella</em></h3>
+    <table class="table">
+      <thead>
+        <tr><th>Recomendación</th><th>Beneficio principal</th><th>Explicación breve</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><em>Usar los lanes directos de CPU para dispositivos críticos</em></td><td>Máxima velocidad y menor latencia</td><td>GPU y capturadoras deben estar en los slots conectados directamente al CPU.</td></tr>
+        <tr><td><em>Separar el tráfico crítico del secundario</em></td><td>Evita interferencias</td><td>Dejar almacenamiento y red en slots del chipset, lejos del tráfico de vídeo.</td></tr>
+        <tr><td><em>Elegir plataformas con más lanes PCIe</em></td><td>Más dispositivos intensivos sin compartir</td><td>Threadripper / EPYC permiten usar muchas tarjetas de alta demanda simultáneamente.</td></tr>
+        <tr><td><em>Preferir PCIe 5.0 o superior</em></td><td>Duplica o cuadruplica ancho de banda</td><td>Muy útil en capturas 4K/8K o altos FPS.</td></tr>
+        <tr><td><em>Desactivar en BIOS dispositivos que no se usarán</em></td><td>Libera lanes</td><td>Algunos M.2 o puertos comparten lanes con PCIe.</td></tr>
+        <tr><td><em>Usar tarjetas de captura con buen manejo DMA y buffers grandes</em></td><td>Menos picos de demanda</td><td>Ayuda a estabilizar el flujo de datos en tiempo real.</td></tr>
+        <tr><td><em>Activar Re-Size BAR y Above 4G Decoding</em></td><td>Optimiza espacios de direcciones y transferencia</td><td>Recomendado para estaciones de trabajo modernas.</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h3><em>4. Ejemplo de la vida real: cuándo un bus saturado destruye un proyecto</em></h3>
+    <p><strong>Situación:</strong> Un estudio pequeño intenta grabar un evento deportivo en 4K 60 fps desde 4 cámaras profesionales.</p>
+    <p><strong>Equipo:</strong></p>
+    <ul>
+      <li>1 GPU</li>
+      <li>2 tarjetas de captura 4K</li>
+      <li>2 NVMe Gen4</li>
+      <li>Red 10 GbE</li>
+    </ul>
+    <p>Todo conectado sin plan: la placa madre redirigía <em>todos</em> los dispositivos al chipset, lo que saturó el enlace PCIe x4 que une CPU ↔ chipset. Parecía un problema de software, pero era <strong>simplemente falta de ancho de banda</strong>.</p>
+
+    <p><strong>Síntomas:</strong></p>
+    <ul>
+      <li>La vista previa se congelaba por momentos</li>
+      <li>La grabación tenía frames saltados</li>
+      <li>El audio perdía sincronía</li>
+      <li>La CPU apenas estaba al 40 %, lo cual confundía a los técnicos</li>
+    </ul>
+
+    <p><strong>Solución aplicada:</strong></p>
+    <ul>
+      <li>Reordenar las tarjetas poniendo GPU y capturas en slots directos al CPU</li>
+      <li>Pasar los NVMe y la red al chipset</li>
+      <li>Desactivar un slot M.2 que robaba lanes</li>
+      <li>Actualizar la BIOS y activar Above 4G Decoding</li>
+    </ul>
+
+    <p><strong>Resultado:</strong> Se eliminó por completo la pérdida de frames, la sincronización se mantuvo, y el evento se grabó sin cortes. El problema nunca fue la CPU: <em>era el bus</em>.</p>
+
+    <hr>
+
+    <h3><em>5. Conclusión</em></h3>
+    <p>La saturación del bus de datos ocurre cuando demasiados dispositivos de alta demanda comparten un enlace PCIe limitado. Esto provoca latencias irregulares, pérdida de frames y bajo rendimiento, aun cuando CPU y GPU parecen “ociosas”. La solución no es software, sino diseño: asignar lanes directos del CPU a GPU y capturadoras, mover el tráfico secundario al chipset y usar plataformas con más lanes y mayor generación PCIe.</p>
+
+    <!-- Se elimina el punto 6 (Resumen) y se reemplazan imágenes antiguas -->
+
+    <!-- Imagen final solicitada después de la conclusión -->
+    <figure>
+      <img src="assets/images/images buses.jpg" alt="Imagen buses" class="img-suggest medium">
+    </figure>
+  </main>
+  <footer class="container"><p class="footer-summary">Diagnosticar saturaciones requiere combinar mediciones de software y conocimiento de topología hardware; las decisiones de diseño deben basarse en esta evidencia para garantizar sistemas en tiempo real fiables.</p></footer>
+</body>
+</html>
